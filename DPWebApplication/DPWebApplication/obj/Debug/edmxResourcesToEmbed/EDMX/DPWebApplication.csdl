@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="AuthenticationModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Comment">
+    <Key>
+      <PropertyRef Name="ComId" />
+    </Key>
+    <Property Name="ComId" Type="Int32" Nullable="false" />
+    <Property Name="CommentMsg" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="CommentedDate" Type="DateTime" Precision="3" />
+    <Property Name="PostId" Type="Int32" Nullable="false" />
+    <Property Name="UserId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="SubComments" Relationship="Self.FK_Comment_Id" FromRole="Comment" ToRole="SubComment" />
+    <NavigationProperty Name="Post" Relationship="Self.FK_Post_Id" FromRole="Comment" ToRole="Post" />
+    <NavigationProperty Name="User" Relationship="Self.FK_User_Id" FromRole="Comment" ToRole="User" />
+  </EntityType>
+  <EntityType Name="Post">
+    <Key>
+      <PropertyRef Name="PostId" />
+    </Key>
+    <Property Name="PostId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="PostedDate" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="Comments" Relationship="Self.FK_Post_Id" FromRole="Post" ToRole="Comment" />
+  </EntityType>
+  <EntityType Name="SubComment">
+    <Key>
+      <PropertyRef Name="SubComId" />
+    </Key>
+    <Property Name="SubComId" Type="Int32" Nullable="false" />
+    <Property Name="CommentMsg" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="CommentedDate" Type="DateTime" Precision="3" />
+    <Property Name="ComId" Type="Int32" />
+    <Property Name="UserId" Type="Int32" />
+    <NavigationProperty Name="Comment" Relationship="Self.FK_Comment_Id" FromRole="SubComment" ToRole="Comment" />
+    <NavigationProperty Name="User" Relationship="Self.FK_CUser_Id" FromRole="SubComment" ToRole="User" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="password" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="firstname" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="lastname" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="confirmpassword" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MajorId" Type="Int32" />
+    <NavigationProperty Name="Comments" Relationship="Self.FK_User_Id" FromRole="User" ToRole="Comment" />
+    <NavigationProperty Name="SubComments" Relationship="Self.FK_CUser_Id" FromRole="User" ToRole="SubComment" />
+  </EntityType>
+  <Association Name="FK_Comment_Id">
+    <End Role="Comment" Type="Self.Comment" Multiplicity="0..1" />
+    <End Role="SubComment" Type="Self.SubComment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Comment">
+        <PropertyRef Name="ComId" />
+      </Principal>
+      <Dependent Role="SubComment">
+        <PropertyRef Name="ComId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Post_Id">
+    <End Role="Post" Type="Self.Post" Multiplicity="1" />
+    <End Role="Comment" Type="Self.Comment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Post">
+        <PropertyRef Name="PostId" />
+      </Principal>
+      <Dependent Role="Comment">
+        <PropertyRef Name="PostId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_User_Id">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Comment" Type="Self.Comment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="UserId" />
+      </Principal>
+      <Dependent Role="Comment">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_CUser_Id">
+    <End Role="User" Type="Self.User" Multiplicity="0..1" />
+    <End Role="SubComment" Type="Self.SubComment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="UserId" />
+      </Principal>
+      <Dependent Role="SubComment">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="AuthenticationEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Comments" EntityType="Self.Comment" />
+    <EntitySet Name="Posts" EntityType="Self.Post" />
+    <EntitySet Name="SubComments" EntityType="Self.SubComment" />
+    <EntitySet Name="Users" EntityType="Self.User" />
+    <AssociationSet Name="FK_Comment_Id" Association="Self.FK_Comment_Id">
+      <End Role="Comment" EntitySet="Comments" />
+      <End Role="SubComment" EntitySet="SubComments" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Post_Id" Association="Self.FK_Post_Id">
+      <End Role="Post" EntitySet="Posts" />
+      <End Role="Comment" EntitySet="Comments" />
+    </AssociationSet>
+    <AssociationSet Name="FK_User_Id" Association="Self.FK_User_Id">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Comment" EntitySet="Comments" />
+    </AssociationSet>
+    <AssociationSet Name="FK_CUser_Id" Association="Self.FK_CUser_Id">
+      <End Role="User" EntitySet="Users" />
+      <End Role="SubComment" EntitySet="SubComments" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
